@@ -31,19 +31,26 @@ const client = new MongoClient(uri, {
 
 
 function verifyJWT(req, res, next) {
+    console.log("JWT verification ")
     const authHeader = req.headers.authorization;
+    //authorization
+    console.log("authHeader= ", req.headers)
 
+    console.log("authHeader= ", req.headers.authorization)
     if (!authHeader) {
-        return res.status(401).send({ message: 'unauthorized access' });
+        console.log("401 failed to get header")
+        return res.status(401).send({ message: 'unauthorized access 38th line' });
     }
     const token = authHeader.split(' ')[1];
-    console.log(token)
+    console.log("tocken", token)
 
     jwt.verify(token, process.env.ACCESS_TOCKEN_SIGNIN, function (err, decoded) {
         if (err) {
             console.log("in the jhamela = ", err)
-            return res.status(403).send({ message: 'Forbidden access' });
+            return res.status(403).send({ message: 'Forbidden access in varify ' });
         }
+        console.log("Doesnt catch any error ")
+        console.log("decoded= ", decoded)
         req.decoded = decoded;
         next();
     })
@@ -98,10 +105,12 @@ async function run() {
         // });
 
         app.get('/profile', verifyJWT, async (req, res) => {
-            console.log("profile accress request");
-            const decoded = req.decoded;
+            console.log("profile accress request ", req.query.email);
 
-            if (decoded.email !== req.query.email) {
+            const decoded = req.decoded;
+            console.log("decoded in /profile function= ", decoded)
+            console.log("query email= ", req.query.email)
+            if (decoded.Uemail !== req.query.email) {
                 return res.status(403).send({ message: 'unauthorized access' });
             }
 
@@ -111,12 +120,13 @@ async function run() {
                     email: req.query.email
                 }
             }
+            console.log("varified")
             res.send("Verified");
         });
 
 
     } finally {
-        await client.close();
+        //await client.close();
     }
 }
 run().catch(console.dir);

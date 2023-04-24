@@ -78,7 +78,7 @@ function verifyJWT(req, res, next) {
 async function run() {
     try {
         await client.connect();
-        await client.db("admin").command({ ping: 1 });
+        const usercollection = await client.db("ParticipantTO3").collection("users");
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
         app.post('/jwt', async (req, res) => {
             console.log("jwt called")
@@ -87,22 +87,13 @@ async function run() {
             res.send({ token })
         })
 
-        // app.get('/profile', verifyJWT, async (req, res) => {
-        //     console.log("profile accress request");
-        //     const decoded = req.decoded;
-
-        //     if (decoded.email !== req.query.email) {
-        //         res.status(403).send({ message: 'unauthorized access' })
-        //     }
-
-        //     let query = {};
-        //     if (req.query.email) {
-        //         query = {
-        //             email: req.query.email
-        //         }
-        //     }
-        //     res.send("Verified");
-        // });
+        app.post('/signin/addtodb', async (req, res) => {
+            console.log("post is called")
+            const user = req.body;
+            console.log("requested to insert= \n", user);
+            const result = await usercollection.insertOne(user);
+            res.send(result)
+        })
 
         app.get('/profile', verifyJWT, async (req, res) => {
             console.log("profile accress request ", req.query.email);
@@ -121,7 +112,7 @@ async function run() {
                 }
             }
             console.log("varified")
-            res.send("Verified");
+            res.send(query);
         });
 
 

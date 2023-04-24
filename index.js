@@ -91,6 +91,7 @@ async function run() {
             console.log("post is called")
             const user = req.body;
             console.log("requested to insert= \n", user);
+            user.approval = 'false';
             const result = await usercollection.insertOne(user);
             res.send(result)
         })
@@ -112,7 +113,20 @@ async function run() {
                 }
             }
             console.log("varified")
-            res.send(query);
+            const cursor = usercollection.find(query);
+            const USERprofile = await cursor.toArray();
+            const profile = {
+                FullName: USERprofile[0].FullName,
+                MobileNumber: USERprofile[0].MobileNumber,
+                email: USERprofile[0].email,
+                Institution: USERprofile[0].Institution,
+                address: USERprofile[0].address,
+                SID: USERprofile[0].SID,
+                PayAccount: USERprofile[0].PayAccount,
+                PayDate: USERprofile[0].PayDate,
+            };
+            res.send(profile);
+
         });
 
 
